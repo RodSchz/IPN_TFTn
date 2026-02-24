@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>PEX para IPN_TFTn</description>
+ <version>0.1</version>
+ <category>lvs</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>lvs_scripts</group-name>
+ <menu-path>tools_menu.lvs.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>lvs-dsl-xml</dsl-interpreter-name>
+ <text># ===== IPN_TFT =====================
+# Soporta:
+#  - Transistores TFTn
+#  - Resistores parasitos Mo
+#  - Capacitores parásitos MOSCAP (sin dependencia de voltaje de compuerta)
+
+# --------- INICIO ----------
+deep
+report_lvs
+
+#use_globals = ($use_globals.to_s.downcase == "true")
+use_globals = "true"
+
+# --- Entrada opcional (cuando se ejecuta por "Run DRC/LVS") ---
+if $input
+  if $topcell
+    source($input, $topcell)
+  else
+    source($input)
+  end
+end
+
+# --------- Capas de proceso ----------
+psub = input(1,0)   # Substrato Si-P
+glbl = input(1,1)   # Etiqueta global para compuerta
+diel = input(3,0)   # Dielectrico (no utilizada, para compatibilidad futura)
+semi = input(4,0)   # Semiconductor IGZO
+tftg = input(4,1)   # Marcador transistor
+met1 = input(5,0)   # Capa metal, molibdeno
+mlbl = input(5,1)   # Etiquetas metal
+mpin = input(5,2)   # Marcador puerto
+
+# --------- Capas derivadas ----------
+
+cont_sem = met1 &amp; semi
+res_term = met1 &amp; mpin
+res_body = met1 - res_term
+
+# --------- Conectividad ----------
+connect(cont_sem, met1)
+
+# propagación de nombres
+connect(met1, mlbl)
+connect(psub, glbl)
+connect(res_term, mlbl)
+connect_global(semi,"GND")
+
+# ===========================================================
+#        EXTRACCIÓN DE DISPOSITIVOS — MOS
+# ===========================================================
+extract_devices(mos4("TFTn_IPN"), {
+  "SD" =&gt; cont_sem, 
+  "G" =&gt; tftg,
+  "W" =&gt; semi,
+  "tD" =&gt; cont_sem, 
+  "tS" =&gt; cont_sem,  
+  "tG" =&gt; psub,
+  "tB" =&gt; semi
+})
+
+# ===========================================================
+#        EXTRACCIÓN DE RESISTORES
+# ===========================================================
+# resistividad Mo
+rho_mo  = 0.0005
+# resistividad por cuadro Mo, con espesor 100nm
+rsq_mo  = 50
+
+# Extracción de resistores en capa de Mo
+extract_devices(resistor("R_METAL1", rsq_mo),    { "R" =&gt; res_body,    "C" =&gt; res_term })
+
+# ===========================================================
+#        EXTRACCIÓN DE CAPACITORES
+# ===========================================================
+# Capacitancia estimada entre Mo y Si-P
+cap_mos    = 2.21e-15   # Estimación inicial sin considerar dependencia de voltaje entre metal y substrato
+
+extract_devices(capacitor("C_MOSCAP", cap_mos), {
+  "P1" =&gt; met1,
+  "P2" =&gt; psub
+})
+
+# ===========================================================
+#              PUERTOS Y SPICE
+# ===========================================================
+# ======= Nombre de archivo según la celda top =======
+def top_cell_name_fallback
+  # 1) Si se pasó -rd topcell=...
+  return $topcell if $topcell &amp;&amp; !$topcell.to_s.empty?
+
+  # 2) Si hay GUI activa, toma la celda activa
+  begin
+    mw = RBA::Application.instance.main_window
+    if mw
+      cv = mw.current_view&amp;.active_cellview
+      return cv.cell.name if cv &amp;&amp; cv.cell
+    end
+  rescue
+  end
+
+  # 3) Si ya hay netlist con circuitos, usa el primero
+  begin
+    nl = netlist
+    if nl &amp;&amp; nl.circuits &amp;&amp; nl.circuits.size &gt; 0
+      return nl.circuits.first.name
+    end
+  rescue
+  end
+
+  # 4) Respaldo
+  "extracted"
+end
+
+# Sanitiza para nombre de archivo (quita caracteres raros)
+base_name = top_cell_name_fallback.gsub(/[^A-Za-z0-9._-]+/, "_")
+out_path  = $out_spice || "#{base_name}.cir"
+
+# ====================================================
+netlist.make_top_level_pins
+# netlist.simplify           # útil desactivado al depurar
+netlist.purge
+netlist.purge_nets
+
+use_net_names = true
+with_comments = false
+
+target_netlist(out_path,
+               write_spice(use_net_names, with_comments),
+               "Extracted by KLayout (IPN_TFTn, LNunT, IPN)")
+
+</text>
+</klayout-macro>

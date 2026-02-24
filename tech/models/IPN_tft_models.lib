@@ -1,0 +1,2 @@
+* Modelos para proceso IPN_TFTn
+.model TFT_IPN nmos(KP=14.7u Vto=0.53388 lambda=0.15 Tox=29n)

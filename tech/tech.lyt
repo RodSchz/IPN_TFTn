@@ -6,7 +6,7 @@
  <dbu>0.001</dbu>
  <default-grids>1,2.5,5,10,20,25,50,100,200,250,500</default-grids>
  <base-path/>
- <original-base-path>C:\Users\Lenovo\KLayout\salt\IPN_TFTn\tech</original-base-path>
+ <original-base-path>C:\Users\Equipo1\KLayout\salt\IPN_TFTn\tech</original-base-path>
  <layer-properties_file>IPN_TFTn_layers.lyp</layer-properties_file>
  <add-other-layers>true</add-other-layers>
  <reader-options>
@@ -162,5 +162,9 @@
   </mag>
  </writer-options>
  <connectivity>
+  <stack>
+   <name/>
+   <description/>
+  </stack>
  </connectivity>
 </technology>

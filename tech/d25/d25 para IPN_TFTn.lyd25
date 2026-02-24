@@ -17,23 +17,21 @@
  <dsl-interpreter-name>d25-dsl-xml</dsl-interpreter-name>
  <text># Definición de pila de materiales para vista 2.5
 # IPN_TFTn
-# Autor: Rodolfo Sanchez Fraga
+# Autor proceso: Norberto Hernández Como
+# Autor script: Rodolfo Sanchez Fraga
 # Fecha: Febrero_2026
 # Laboratorio Nacional de Micro y Nano Tecnologías
 
 # Definición de capas
 substrate = input(1,0)
-cr_au = input(2,0)
-hfo2_cut = input(3,0)
 igzo = input(4,0)
 mo = input(5,0)
 
-
+# Visualización de capas (no a escala)
 z(substrate, -2.00 .. 0.0, like: "1/0", name:"Substrate")
-z(cr_au, 0.0 .. 1.0, like: "2/0", name:"Cr/Au")
-z(hfo2_cut, 1.0 .. 2.5, like: "5/0", name:"HfO2 cut")
-z(igzo, 1.5 .. 2.5, like: "4/0", name:"HfO2 cut")
-z(mo, 2.5 .. 3.0, like: "5/0", name:"Mo")
+z(substrate, 0.0 .. 1.0,   like: "3/0", name:"Al2O3 (20nm)")
+z(igzo, 1.0 .. 2.5,        like: "4/0", name:"IGZO (10nm)")
+z(mo, 2.5 .. 3.0, like: "5/0", name:"Molybdeno (100nm)")
 
 </text>
 </klayout-macro>

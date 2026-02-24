@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Modelos para IPN_TFTn</description>
+ <version>0.1</version>
+ <category>lvs</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>lvs_scripts</group-name>
+ <menu-path>tools_menu.lvs.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>lvs-dsl-xml</dsl-interpreter-name>
+ <text># Para exportar archivo de modelos en la ruta del layout
+
+# Obtener ruta del layout
+  view = RBA::Application.instance.main_window.current_view
+  if view &amp;&amp; view.active_cellview
+    layout_path = view.active_cellview.filename
+    output_dir = File.dirname(layout_path)
+  else
+    output_dir = Dir.pwd
+  end
+
+puts "Ruta del layout actual: #{output_dir}"  
+lib_path = WriteModels.create_models(output_dir)</text>
+</klayout-macro>
