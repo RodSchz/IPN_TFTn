@@ -13,7 +13,7 @@ module WriteModels
       f.puts "* Autor script: Rodolfo Sanchez Fraga"
       f.puts "* Autor modelo: Norberto Hernandez Como"
       f.puts "* Laboratorio Nacional de Micro y Nano Tecnologías (LNunT)"
-      f.puts ".model TFTn_IPN nmos (level=15 vto=0.426 muband=.174 m=2.277 alphasat=0.367 gamma=0.777 lambda=-0.042 def0=0.4 vmin=0.06 TOX=20e-9 TM=10e-9 cgdo=1.1e-8 cgso=1.1e-8 RD=1300 RS=1300 )"
+      f.puts ".model TFTn_IPN nmos (vto=0.426 muband=.174 m=2.277 alphasat=0.367 gamma=0.777 lambda=-0.042 def0=0.4 vmin=0.06 TOX=20e-9 TM=10e-9 cgdo=1.1e-8 cgso=1.1e-8 RD=1300 RS=1300 )"
     end
     
     puts "Archivo .lib generado en: #{lib_path}"

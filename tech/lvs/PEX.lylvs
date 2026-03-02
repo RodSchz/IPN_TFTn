@@ -38,39 +38,43 @@ if $input
 end
 
 # --------- Capas de proceso ----------
-psub = input(1,0)   # Substrato Si-P
-glbl = input(1,1)   # Etiqueta global para compuerta
-diel = input(3,0)   # Dielectrico (no utilizada, para compatibilidad futura)
-semi = input(4,0)   # Semiconductor IGZO
-tftg = input(4,1)   # Marcador transistor
-met1 = input(5,0)   # Capa metal, molibdeno
-mlbl = input(5,1)   # Etiquetas metal
-mpin = input(5,2)   # Marcador puerto
+psub = input(1,0)      # Substrato Si-P
+glbl = labels(1,1)     # Etiqueta global (labels)
+diel = input(3,0)      # Dieléctrico (no utilizada por ahora)
+semi = input(4,0)      # Semiconductor IGZO
+tftg = input(4,1)      # Marcador transistor
+met1 = input(5,0)      # Metal (Mo)
+mlbl = labels(5,1)     # Etiquetas metal (labels)
+mpin = input(5,2)      # Marcador puerto (shapes)
 
 # --------- Capas derivadas ----------
+cont_sem = met1 &amp; semi              # Intersección metal-semiconductor (contacto SD)
+res_term = (met1 &amp; mpin) + cont_sem # Terminales del resistor: pads/nodos marcados con mpin + contacto SD
+res_body = met1 - res_term          # Cuerpo resistivo: todo el metal que NO es terminal+++
 
-cont_sem = met1 &amp; semi
-res_term = met1 &amp; mpin
-res_body = met1 - res_term
+# Metal "conectable" (ideal): SOLO terminales/pads/nodos, EXCLUYE el cuerpo resistivo
+# Esto evita que toda la tira metálica sea una sola red.
+met1_conn = met1 - res_body   # equivalente a res_term, explícito
 
 # --------- Conectividad ----------
-connect(cont_sem, met1)
-
-# propagación de nombres
-connect(met1, mlbl)
-connect(psub, glbl)
-connect(res_term, mlbl)
-connect_global(semi,"GND")
+connect(cont_sem, met1_conn)  # Conecta el contacto SD a la red de metal "conectable" (no al met1 completo)
+connect(met1_conn, mlbl)      # Propagación de nombres desde etiquetas (labels) hacia las redes
+connect(psub, glbl)           # Para asignar puerto a compuertas compartidas
+connect_global(semi, "GND")   # Global (si aplica)
+connect(res_term,mlbl)
+connect(res_term,cont_sem)
 
 # ===========================================================
-#        EXTRACCIÓN DE DISPOSITIVOS — MOS
+#        EXTRACCIÓN DE TRANSISTORES
 # ===========================================================
 extract_devices(mos4("TFTn_IPN"), {
-  "SD" =&gt; cont_sem, 
-  "G" =&gt; tftg,
-  "W" =&gt; semi,
-  "tD" =&gt; cont_sem, 
-  "tS" =&gt; cont_sem,  
+  "SD" =&gt; cont_sem,
+  "G"  =&gt; tftg,
+  "W"  =&gt; semi,
+
+  # Marcadores de terminal
+  "tD" =&gt; cont_sem,
+  "tS" =&gt; cont_sem,
   "tG" =&gt; psub,
   "tB" =&gt; semi
 })
@@ -78,34 +82,33 @@ extract_devices(mos4("TFTn_IPN"), {
 # ===========================================================
 #        EXTRACCIÓN DE RESISTORES
 # ===========================================================
-# resistividad Mo
-rho_mo  = 0.0005
-# resistividad por cuadro Mo, con espesor 100nm
-rsq_mo  = 50
+rsq_mo = 50   # Resistencia de hoja de Mo en Ω/□
 
-# Extracción de resistores en capa de Mo
-extract_devices(resistor("R_METAL1", rsq_mo),    { "R" =&gt; res_body,    "C" =&gt; res_term })
+extract_devices(resistor("R_METAL1", rsq_mo), {
+  "R"  =&gt; res_body,
+  "C"  =&gt; res_term,
+  "tA" =&gt; res_term,
+  "tB" =&gt; res_term
+})
 
 # ===========================================================
 #        EXTRACCIÓN DE CAPACITORES
 # ===========================================================
-# Capacitancia estimada entre Mo y Si-P
-cap_mos    = 2.21e-15   # Estimación inicial sin considerar dependencia de voltaje entre metal y substrato
+cap_mos = 2.21e-15
 
+# Capacitores entre Mo y Substrato
+# Para no volver a "puentear" el cuerpo resistivo, se usa met1_conn como placa superior
 extract_devices(capacitor("C_MOSCAP", cap_mos), {
-  "P1" =&gt; met1,
+  "P1" =&gt; met1_conn,
   "P2" =&gt; psub
 })
 
 # ===========================================================
 #              PUERTOS Y SPICE
 # ===========================================================
-# ======= Nombre de archivo según la celda top =======
 def top_cell_name_fallback
-  # 1) Si se pasó -rd topcell=...
   return $topcell if $topcell &amp;&amp; !$topcell.to_s.empty?
 
-  # 2) Si hay GUI activa, toma la celda activa
   begin
     mw = RBA::Application.instance.main_window
     if mw
@@ -115,7 +118,6 @@ def top_cell_name_fallback
   rescue
   end
 
-  # 3) Si ya hay netlist con circuitos, usa el primero
   begin
     nl = netlist
     if nl &amp;&amp; nl.circuits &amp;&amp; nl.circuits.size &gt; 0
@@ -124,15 +126,12 @@ def top_cell_name_fallback
   rescue
   end
 
-  # 4) Respaldo
   "extracted"
 end
 
-# Sanitiza para nombre de archivo (quita caracteres raros)
 base_name = top_cell_name_fallback.gsub(/[^A-Za-z0-9._-]+/, "_")
 out_path  = $out_spice || "#{base_name}.cir"
 
-# ====================================================
 netlist.make_top_level_pins
 # netlist.simplify           # útil desactivado al depurar
 netlist.purge
@@ -141,9 +140,9 @@ netlist.purge_nets
 use_net_names = true
 with_comments = false
 
-target_netlist(out_path,
-               write_spice(use_net_names, with_comments),
-               "Extracted by KLayout (IPN_TFTn, LNunT, IPN)")
-
-</text>
+target_netlist(
+  out_path,
+  write_spice(use_net_names, with_comments),
+  "Extracted by KLayout (IPN_TFTn, LNunT, IPN)"
+)</text>
 </klayout-macro>

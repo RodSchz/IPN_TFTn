@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>DRC para IPN_TFTn</description>
+ <version>0.1</version>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>drc_scripts</group-name>
+ <menu-path>tools_menu.drc.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
+ <text># DRC para proceso "IPN_TFTn"
+# Autor: Rodolfo Sanchez Fraga
+# Fecha: Febrero-2026
+# Laboratorio Nacional de Micro y Nano Tecnología (LNunT)
+
+report("DRC para IPN_TFTn")
+
+  # Definición de capas
+  substrate = input(1,0)
+  igzo = input(4,0)
+  tft_gate = input(4,1)
+  mo_metal = input(5,0)
+  mo_labels = input(5,1)
+  mo_port = input(5,2)
+  
+  
+  # Reglas para metal
+  #metal.width(20.um).output("Ancho de metal", "Violación de ancho mínimo de metal (&lt;20um)")
+  #metal.space(20.um).output("Espacio entre metal", "Violación de espacio entre metal (&lt;20um)")
+  #metal.notch(20.um).output("Muesca en metal", "Violación de tamaño de muesca en metal (&lt;20um)")
+  
+  # Reglas de capas físicas en espacio de diseño
+  mo_metal.outside(substrate).output("Metal fuera de área de diseño","Metal debe estar definido dentro de área de substrato")
+  igzo.outside(substrate).output("IGZO fuera de área de diseño","IGZO debe estar definido dentro de área de substrato")
+  
+  # Reglas de metal
+  mo_metal.width(5.um).output("Ancho de metal Mo", "Violación de ancho mínimo de metal+pin (&lt;20um)")
+  mo_metal.space(5.um).output("Espacio entre metal Mo", "Violación de espacio entre metal+pin (&lt;20um)")
+  mo_metal.notch(5.um).output("Muesca en metal Mo", "Violación de tamaño de muesca en metal+pin (&lt;20um)")  
+  
+  # Error de dibujo en capa de etiquetas
+  mo_labels.width(5000.um).output("Geometrias en capa de etiquetas", "Geometrías en capa de etiquetas no se toman en cuenta")
+  
+  substrate.enclosing(mo_metal,50.um).output("Error a borde de substrato","Espacio a borde de chip insuficiente (&lt;50um)")
+  
+  mo_metal.odd_polygons.output("Error poligono metal", "Poligono con autotraslape en Mo.drawing")
+  mo_port.odd_polygons.output("Error poligono puerto", "Poligono con autotraslape en capa de Mo.port")
+  </text>
+</klayout-macro>
