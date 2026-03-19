@@ -24,14 +24,23 @@
 
 # Definición de capas
 substrate = input(1,0)
+gate = input(2,0)
+contact = input(3,0)
 igzo = input(4,0)
 mo = input(5,0)
+passivation_cut = input(6,0)
+
+oxide = substrate - contact
+passivation = substrate - passivation_cut
 
 # Visualización de capas (no a escala)
 z(substrate, -2.00 .. 0.0, like: "1/0", name:"Substrate")
-z(substrate, 0.0 .. 1.0,   like: "3/0", name:"Al2O3 (20nm)")
-z(igzo, 1.0 .. 2.5,        like: "4/0", name:"IGZO (10nm)")
+z(gate, 0.0 .. 1.0,   like: "2/0", name:"Cr/Au (1um)")
+z(oxide, 1.0 .. 1.5,   like: "3/0", name:"Al2O3 (0.5um)")
+z(igzo, 1.5 .. 2.5,        like: "4/0", name:"IGZO (10nm)")
 z(mo, 2.5 .. 3.0, like: "5/0", name:"Molybdeno (100nm)")
+z(contact, 1.0 .. 2.5, like: "5/0", name:"Contactos de molybdeno (100nm)")
+z(passivation, 3.0 .. 3.5, like: "6/0", name:"PMMA (100nm)")
 
 </text>
 </klayout-macro>

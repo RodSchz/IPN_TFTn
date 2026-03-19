@@ -36,27 +36,33 @@ if $input
 end
 
 # --------- Capas de proceso ----------
-psub = input(1,0)   # Substrato Si-P
-glbl = input(1,1)   # Etiqueta global para compuerta
-diel = input(3,0)   # Dielectrico (no utilizada, para compatibilidad futura)
+subt = input(1,0)   # Substrato
+#glbl = input(1,1)   # Etiqueta global para compuerta
+gate = input(2,0)
+dcut = input(3,0)   # Dielectrico (no utilizada, para compatibilidad futura)
 semi = input(4,0)   # Semiconductor IGZO
 tftg = input(4,1)   # Marcador transistor
 met1 = input(5,0)   # Capa metal, molibdeno
 mlbl = input(5,1)   # Etiquetas metal
 mpin = input(5,2)   # Marcador puerto
+pass = input(6,0)
 
 # --------- Capas derivadas ----------
 
 cont_sem = met1 &amp; semi
+cont_gat = gate &amp; semi
 res_term = met1 &amp; mpin
 res_body = met1 - res_term
 
 # --------- Conectividad ----------
 connect(cont_sem, met1)
+connect(cont_gat, gate)
+connect(met1,dcut)
+connect(gate,dcut)
 
 # propagación de nombres
 connect(met1, mlbl)
-connect(psub, glbl)
+#connect(psub, glbl)
 connect(res_term, mlbl)
 connect_global(semi,"GND")
 
@@ -70,7 +76,7 @@ extract_devices(mos4("TFTn_IPN"), {
   "W" =&gt; semi,
   "tD" =&gt; cont_sem, 
   "tS" =&gt; cont_sem,  
-  "tG" =&gt; psub,
+  "tG" =&gt; cont_gat,
   "tB" =&gt; semi
 })
 
