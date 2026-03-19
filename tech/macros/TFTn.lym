@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>TFT tipo n</description>
+ <version>0.2</version>
+ <category/>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>ruby</interpreter>
+ <dsl-interpreter-name/>
+ <text># $description: LNunT - TFT bottom-gate top-contact PCell
+# $show-in-menu
+# $menu-path: Tools.LNunT TFT Library
+
+include RBA
+
+# Si vuelves a correr el macro durante pruebas, esto evita advertencias de constantes
+Object.send(:remove_const, :LNunT_TFT) if Object.const_defined?(:LNunT_TFT)
+
+module LNunT_TFT
+
+  class TFT_BG_TC &lt; PCellDeclarationHelper
+    include RBA
+
+    def initialize
+      super
+
+      # -----------------------------
+      # Capas
+      # -----------------------------
+      param(:gate_layer,   TypeLayer,  "Gate layer",          :default =&gt; LayerInfo.new(2, 0))  # Cr/Au.drawing
+      param(:semi_layer,   TypeLayer,  "Semiconductor layer", :default =&gt; LayerInfo.new(4, 0))  # IGZO.drawing
+      param(:marker_layer, TypeLayer,  "TFT marker layer",    :default =&gt; LayerInfo.new(4, 1))  # tft.marker
+      param(:sd_layer,     TypeLayer,  "Source/Drain layer",  :default =&gt; LayerInfo.new(5, 0))  # Mo.drawing
+
+      # -----------------------------
+      # Dimensiones nominales del canal
+      # El marker define L y W
+      # -----------------------------
+      param(:l, TypeDouble, "Channel length L", :default =&gt; 40.0, :unit =&gt; "um")
+      param(:w, TypeDouble, "Channel width W",  :default =&gt; 200.0, :unit =&gt; "um")
+
+      # -----------------------------
+      # Geometría de gate
+      # -----------------------------
+      param(:gate_ovl_x, TypeDouble, "Gate overlap beyond marker in X", :default =&gt; 20.0,  :unit =&gt; "um")
+      param(:gate_ext_y, TypeDouble, "Gate extension for routing in Y", :default =&gt; 40.0, :unit =&gt; "um")
+
+      # -----------------------------
+      # Geometría de semiconductor
+      # -----------------------------
+      param(:semi_ovl_x, TypeDouble, "Semiconductor extension beyond marker in X", :default =&gt; 40.0, :unit =&gt; "um")
+      param(:semi_ext_y, TypeDouble, "Semiconductor extension beyond marker in Y", :default =&gt; 20.0, :unit =&gt; "um")
+
+      # -----------------------------
+      # Geometría de source/drain
+      # -----------------------------
+      param(:sd_length,    TypeDouble, "Source/Drain metal length outward",     :default =&gt; 40.0, :unit =&gt; "um")
+      param(:sd_ext_y,     TypeDouble, "Source/Drain extension beyond W in Y",  :default =&gt; 0.0,  :unit =&gt; "um")
+      param(:sd_overlap_x, TypeDouble, "Source/Drain overlap into marker in X", :default =&gt; 0.0,  :unit =&gt; "um")
+
+      # -----------------------------
+      # Opcionales
+      # -----------------------------
+      param(:draw_marker, TypeBoolean, "Draw TFT marker", :default =&gt; true)
+    end
+
+    def display_text_impl
+      "TFT_BG_TC(L=#{sprintf('%.3f', l)},W=#{sprintf('%.3f', w)})"
+    end
+
+    def coerce_parameters_impl
+      self.l = 0.1 if l &lt;= 0.0
+      self.w = 0.1 if w &lt;= 0.0
+
+      self.gate_ovl_x = 0.0 if gate_ovl_x &lt; 0.0
+      self.gate_ext_y = 0.0 if gate_ext_y &lt; 0.0
+
+      self.semi_ovl_x = 0.0 if semi_ovl_x &lt; 0.0
+      self.semi_ext_y = 0.0 if semi_ext_y &lt; 0.0
+
+      self.sd_length = 0.0 if sd_length &lt; 0.0
+      self.sd_ext_y  = 0.0 if sd_ext_y &lt; 0.0
+      self.sd_overlap_x = 0.0 if sd_overlap_x &lt; 0.0
+
+      # Evita que source y drain crucen completamente el canal nominal
+      max_sd_ov = l * 0.49
+      self.sd_overlap_x = max_sd_ov if sd_overlap_x &gt; max_sd_ov
+    end
+
+    # Opcional: permitir crear la PCell a partir de una caja/path/polígono
+    def can_create_from_shape_impl
+      shape.is_box? || shape.is_polygon? || shape.is_path?
+    end
+
+    def parameters_from_shape_impl
+      dbu = layout.dbu
+      bb = shape.bbox
+
+      # Toma el bounding box como referencia rápida
+      self.l = bb.width * dbu
+      self.w = bb.height * dbu
+    end
+
+    def transformation_from_shape_impl
+      Trans.new(shape.bbox.center)
+    end
+
+    def produce_impl
+
+      dbu = layout.dbu
+      to_dbu = lambda { |x_um| (x_um / dbu).round }
+
+      ly_gate   = layout.layer(gate_layer)
+      ly_semi   = layout.layer(semi_layer)
+      ly_marker = layout.layer(marker_layer)
+      ly_sd     = layout.layer(sd_layer)
+
+      # ---------------------------------
+      # Coordenadas nominales del canal
+      # marker = ventana nominal del TFT
+      # ---------------------------------
+      x1m = to_dbu.call(-l / 2.0)
+      x2m = to_dbu.call( l / 2.0)
+      y1m = to_dbu.call(-w / 2.0)
+      y2m = to_dbu.call( w / 2.0)
+
+      marker_box = Box.new(x1m, y1m, x2m, y2m)
+
+      # ---------------------------------
+      # Gate (vertical, con extensión arriba/abajo)
+      # ---------------------------------
+      x1g = to_dbu.call(-(l / 2.0 + gate_ovl_x))
+      x2g = to_dbu.call( (l / 2.0 + gate_ovl_x))
+      y1g = to_dbu.call(-(w / 2.0 + gate_ext_y))
+      y2g = to_dbu.call( (w / 2.0 + gate_ext_y))
+
+      gate_box = Box.new(x1g, y1g, x2g, y2g)
+
+      # ---------------------------------
+      # Semiconductor
+      # Más grande que el marker para dar margen de proceso
+      # ---------------------------------
+      x1s = to_dbu.call(-(l / 2.0 + semi_ovl_x))
+      x2s = to_dbu.call( (l / 2.0 + semi_ovl_x))
+      y1s = to_dbu.call(-(w / 2.0 + semi_ext_y))
+      y2s = to_dbu.call( (w / 2.0 + semi_ext_y))
+
+      semi_box = Box.new(x1s, y1s, x2s, y2s)
+
+      # ---------------------------------
+      # Source / Drain
+      # Corriente horizontal: izquierda -&gt; derecha
+      # El borde interno nominal queda en +/- L/2,
+      # salvo el ajuste por sd_overlap_x
+      # ---------------------------------
+      x_left_outer  = to_dbu.call(-(l / 2.0 + sd_length))
+      x_left_inner  = to_dbu.call(-(l / 2.0) + sd_overlap_x)
+
+      x_right_inner = to_dbu.call( (l / 2.0) - sd_overlap_x)
+      x_right_outer = to_dbu.call( (l / 2.0 + sd_length))
+
+      ysd1 = to_dbu.call(-(w / 2.0 + sd_ext_y))
+      ysd2 = to_dbu.call( (w / 2.0 + sd_ext_y))
+
+      source_box = Box.new(x_left_outer,  ysd1, x_left_inner,  ysd2)
+      drain_box  = Box.new(x_right_inner, ysd1, x_right_outer, ysd2)
+
+      # ---------------------------------
+      # Inserción en celda
+      # ---------------------------------
+      cell.shapes(ly_gate).insert(gate_box)
+      cell.shapes(ly_semi).insert(semi_box)
+      cell.shapes(ly_sd).insert(source_box)
+      cell.shapes(ly_sd).insert(drain_box)
+
+      if draw_marker
+        cell.shapes(ly_marker).insert(marker_box)
+      end
+    end
+  end
+
+  class TFTLibrary &lt; Library
+    def initialize
+      self.description = "TFT Pcell Library"
+
+      layout.register_pcell("TFT_BG_TC", TFT_BG_TC.new)
+
+      register("IPN_TFTn_transitor")
+    end
+  end
+
+end
+
+LNunT_TFT::TFTLibrary.new
+</text>
+</klayout-macro>
