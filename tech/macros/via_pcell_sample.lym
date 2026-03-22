@@ -18,23 +18,10 @@
  <text># Sample via PCell
 # 
 # This sample PCell implements a library called "LNunT_TFT" with a single PCell that
-# provides two vias for a hypothetical technology with these layers:
+# provides two vias for IPN_TFTN
 # 
-#   1/0  Metal1
-#   2/0  Via1
-#   3/0  Metal2
-#   4/0  Via2
-#   5/0  Metal3
-# 
-# The sample demonstrates how to equip a PCell with the necessary declarations,
-# so it can supply vias for the wire (path) tool.
-# 
-# It implements simple rectangular via arrays made from squares with a fixed size,
-# pitch and enclosure.
-# 
-# NOTE: after changing the code, the macro needs to be rerun to install the new
-# implementation. The macro is also set to "auto run" to install the PCell 
-# when KLayout is run.
+# Rodolfo Sanchez Fraga
+# Marzo 2026
 
 module LNunT_Via
 

@@ -10,12 +10,15 @@
  <autorun-early>false</autorun-early>
  <priority>0</priority>
  <shortcut/>
- <show-in-menu>true</show-in-menu>
+ <show-in-menu>false</show-in-menu>
  <group-name>lvs_scripts</group-name>
  <menu-path>tools_menu.lvs.end</menu-path>
  <interpreter>dsl</interpreter>
  <dsl-interpreter-name>lvs-dsl-xml</dsl-interpreter-name>
  <text># Para exportar archivo de modelos en la ruta del layout
+# Rodolfo Sanchez Fraga
+# Marzo 2026
+
 
 # Obtener ruta del layout
   view = RBA::Application.instance.main_window.current_view

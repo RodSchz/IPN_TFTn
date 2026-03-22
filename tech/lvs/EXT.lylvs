@@ -18,7 +18,8 @@
  <text># ===== IPN_TFT =====================
 # Soporta:
 #  - Transistores TFTn
-
+# Rodolfo Sanchez Fraga
+# Marzo 2026
 # --------- INICIO ----------
 deep
 report_lvs
@@ -65,12 +66,13 @@ connect(met1, mlbl)
 #connect(psub, glbl)
 connect(res_term, mlbl)
 connect_global(semi,"GND")
+connect_implicit("GND")
 
 
 # ===========================================================
 #        EXTRACCIÓN DE DISPOSITIVOS — MOS
 # ===========================================================
-extract_devices(mos4("TFTn_IPN"), {
+extract_devices(mos4("IPN_TFTN"), {
   "SD" =&gt; cont_sem, 
   "G" =&gt; tftg,
   "W" =&gt; semi,

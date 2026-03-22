@@ -18,10 +18,13 @@
  <text># $description: LNunT - TFT bottom-gate top-contact PCell
 # $show-in-menu
 # $menu-path: Tools.LNunT TFT Library
+# Rodolfo Sanchez Fraga
+# Marzo 2026
+
 
 include RBA
 
-# Si vuelves a correr el macro durante pruebas, esto evita advertencias de constantes
+# Si se vuelve a correr el macro, esto evita advertencias de constantes
 Object.send(:remove_const, :LNunT_TFT) if Object.const_defined?(:LNunT_TFT)
 
 module LNunT_TFT

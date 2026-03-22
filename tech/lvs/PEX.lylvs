@@ -20,7 +20,8 @@
 #  - Transistores TFTn
 #  - Resistores parasitos Mo
 #  - Capacitores parásitos MOSCAP (sin dependencia de voltaje de compuerta)
-
+# Rodolfo Sanchez Fraga
+# Marzo 2026
 # --------- INICIO ----------
 deep
 report_lvs

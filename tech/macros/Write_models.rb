@@ -1,5 +1,9 @@
 # $description: Generar modelos de simulación
 # $version: 0.1
+# $autorun
+# Rodolfo Sanchez Fraga
+# Marzo 2026
+
 module WriteModels
  
   include RBA
@@ -11,9 +15,19 @@ module WriteModels
     File.open(lib_path, "w") do |f|
       f.puts "* Modelos para proceso IPN_TFTn"      
       f.puts "* Autor script: Rodolfo Sanchez Fraga"
-      f.puts "* Autor modelo: Norberto Hernandez Como"
       f.puts "* Laboratorio Nacional de Micro y Nano Tecnologías (LNunT)"
-      f.puts ".model TFTn_IPN nmos (vto=0.426 muband=.174 m=2.277 alphasat=0.367 gamma=0.777 lambda=-0.042 def0=0.4 vmin=0.06 TOX=20e-9 TM=10e-9 cgdo=1.1e-8 cgso=1.1e-8 RD=1300 RS=1300 )"
+      f.puts ""
+      f.puts ".model IPN_TFTN NMOS ("
+      f.puts "+ LEVEL=1"
+      f.puts "+ VTO=1.08518"
+      f.puts "+ KP=7.58022e-08"
+      f.puts "+ LAMBDA=0.121604"
+      f.puts "+ GAMMA=0"
+      f.puts "+ PHI=0.7"
+      f.puts "+ RD=0"
+      f.puts "+ RS=0"
+      f.puts "+ CGSO=0"
+      f.puts "+ CGDO=0)"
     end
     
     puts "Archivo .lib generado en: #{lib_path}"

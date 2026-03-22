@@ -1,50 +1,446 @@
-<html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Especificación técnica — IPN_TFTn</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a33;
+      --text:#e9eefc;
+      --muted:#b9c4e6;
+      --accent:#7aa2ff;
+      --accent-2:#87e0ff;
+      --ok:#4cd08a;
+      --warn:#ffd166;
+      --danger:#ff7b7b;
+      --line:#2a355f;
+      --chip:#1a2448;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#0b1020 0%, #0e142a 100%);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;line-height:1.55}
+    a{color:var(--accent-2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    .hero{
+      background:linear-gradient(145deg,#18244a 0%, #101933 100%);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+    .title{margin:0 0 8px 0;font-size:clamp(1.4rem,2.6vw,2.3rem);line-height:1.2}
+    .subtitle{margin:0;color:var(--muted)}
+    .meta-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;margin-top:18px
+    }
+    .meta{
+      background:var(--chip);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:.95rem
+    }
+    .meta b{display:block;color:var(--accent);margin-bottom:4px}
+    nav.toc{
+      margin:22px 0 0;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px 16px;
+    }
+    nav.toc h2{margin:0 0 8px 0;font-size:1.05rem;color:var(--accent-2)}
+    nav.toc ol{margin:0;padding-left:1.2rem}
+    nav.toc li{margin:4px 0}
+    section{
+      margin-top:20px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:20px;
+    }
+    h2{margin:0 0 10px 0;font-size:1.35rem;color:var(--accent-2)}
+    h3{margin:14px 0 8px 0;font-size:1.05rem;color:var(--accent)}
+    p{margin:.5rem 0}
+    ul,ol{margin:.35rem 0 .6rem 1.2rem}
+    .small{font-size:.92rem;color:var(--muted)}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      background:#0f1731;
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid var(--line)
+    }
+    th,td{
+      border-bottom:1px solid var(--line);
+      padding:10px 10px;
+      text-align:left;
+      vertical-align:top
+    }
+    th{background:#16224a;color:#cfe0ff}
+    tr:last-child td{border-bottom:none}
+    code,kbd{
+      background:#101a3a;
+      border:1px solid #2d3b72;
+      border-radius:8px;
+      padding:1px 6px;
+      font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+      font-size:.92em;
+      color:#d8e5ff
+    }
+    .callout{
+      border-left:4px solid var(--warn);
+      background:#3b3019;
+      color:#ffe7a3;
+      padding:10px 12px;
+      border-radius:8px;
+      margin:10px 0
+    }
+    .ok{
+      border-left-color:var(--ok);
+      background:#123124;
+      color:#c7ffe2
+    }
+    .danger{
+      border-left-color:var(--danger);
+      background:#3a1b22;
+      color:#ffd7de
+    }
+    footer{
+      margin:22px 0 10px;
+      color:var(--muted);
+      font-size:.9rem;
+      text-align:center
+    }
+    .badge{
+      display:inline-block;
+      background:#1f2d5c;
+      border:1px solid #3a4e9b;
+      color:#cfe0ff;
+      border-radius:999px;
+      padding:2px 10px;
+      margin-right:6px;
+      font-size:.82rem
+    }
+    .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+  </style>
+</head>
 <body>
+  <main class="container">
+    <header class="hero" id="inicio">
+      <h1 class="title">Especificación técnica del proceso <span class="mono">IPN_TFTn</span></h1>
+      <p class="subtitle">Centro de Ingeniería y Desarrollo Industrial (CIDESI) · Laboratorio Nacional de Micro y Nano Tecnologías (LNunT)</p>
 
-<h1>Your new Package</h1>
+      <div class="meta-grid" aria-label="Datos iniciales y autores">
+        <div class="meta">
+          <b>Autores</b>
+          Paquete de tecnología:<br /> <b>Rodolfo Sánchez Fraga</b><br />
+          Proceso de microfabricación:<br /> <b>Norberto Hernández Como</b>
+        </div>
+        <div class="meta">
+          <b>Instituciones</b>
+          Centro de Nanociencias y Micro y Nano Tecnologías (CNMN-IPN), 
+          Centro de Ingeniería y Desarrollo Industrial (CIDESI)
+        </div>
+        <div class="meta">
+          <b>Versión del documento</b>
+          1.1 (borrador técnico)
+        </div>
+        <div class="meta">
+          <b>Fecha de lanzamiento</b>
+          Marzo 2026
+        </div>
+        <div class="meta">
+          <b>Estado</b>
+          ACTIVO, en desarrollo de PDK y flujo KLayout
+        </div>
+      </div>
 
-<p>
-Your new package is there! You can edit the package properties in the package manager. 
-Use the edit button in the upper right corner of the package details panel to
-open the package editor.
-</p>
+      <nav class="toc" aria-label="Tabla de contenido">
+        <h2>Tabla de contenido</h2>
+        <ol>
+          <li><a href="#descripcion-general">Descripción general</a></li>
+          <li><a href="#especificaciones">Especificaciones generales</a></li>
+          <li><a href="#capas-mascaras">Capas, máscaras y correspondencia física</a></li>
+          <li><a href="#derivacion-geometrica">Derivación geométrica interna (DRC/LVS)</a></li>
+          <li><a href="#reglas-drc">Reglas de diseño (DRC)</a></li>
+          <li><a href="#lvs-netlist">Extracción LVS y netlist</a></li>
+          <li><a href="#flujo">Flujo recomendado de diseño</a></li>
+          <li><a href="#restricciones">Restricciones y buenas prácticas</a></li>
+          <li><a href="#trazabilidad">Trazabilidad y control de cambios</a></li>
+          <li><a href="#observaciones">Observaciones técnicas previas a release</a></li>
+        </ol>
+      </nav>
+    </header>
 
-<p>
-Here is what you should do:
-</p>
+    <section id="descripcion-general">
+      <h2>1) Descripción general</h2>
+      <p><strong>IPN_TFTn</strong> es un proceso de transistor de película delgada tipo n, implementado en arquitectura <strong>bottom-gate / top-contact</strong>, orientado a la fabricación y evaluación de TFTs basados en semiconductor <strong>IGZO</strong>.</p>
+      <p>El stack principal se compone de:</p>
+      <ul>
+        <li><strong>Substrato</strong> (dominio mecánico/geométrico de diseño),</li>
+        <li><strong>Cr/Au</strong> como compuerta inferior,</li>
+        <li><strong>Al₂O₃</strong> como dieléctrico de compuerta,</li>
+        <li><strong>IGZO</strong> como capa semiconductora activa,</li>
+        <li><strong>Mo</strong> para source/drain e interconexión superior,</li>
+        <li><strong>PMMA</strong> como pasivación con aperturas.</li>
+      </ul>
+      <p>El PDK actual incluye tecnología KLayout, archivo de capas, deck DRC, deck de extracción LVS/SPICE, visualización 2.5D, PCell para transistor TFT y PCell de vías/contactos.</p>
+      <p>Aplicaciones objetivo: estructuras TFT de prueba, celdas básicas, caracterización eléctrica y simulación de circuitos a partir de un modelo equivalente tipo MOS utilizado como aproximación compacta del dispositivo TFT.</p>
+    </section>
 
-<ul>
-  <li>Enter your author details</li>
-  <li>Choose a license model</li>
-  <li>Provide an icon and optionally a screenshot image</li>
-  <li>Complete the technology definition</li>
-  <li>Specify dependencies if you plan to use items from other packages</li>
-</ul>
+    <section id="especificaciones">
+      <h2>2) Especificaciones generales</h2>
 
-<p>
-Of course, the most interesting thing is how to edit the technology definition.
-When the package was initialized, a folder hierarchy consisting of a tech
-folder containing a technology definition file and empty "libraries", "macros", 
-"pymacros" and "drc" folders was created. You can use these empty folders
-to put your own files there. The technology definition can be edited in the
-technology manager where you can find the technology as "new_tech" under the
-name you had given the package. Initially, the technology definition is 
-without any particular definitions.
-</p>
+      <h3>2.1 Stack físico nominal</h3>
+      <table>
+        <thead>
+          <tr><th>Capa</th><th>Espesor nominal</th><th>Función</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Bottom gate (Cr/Au)</td><td>70 nm</td><td>Electrodo de compuerta inferior</td></tr>
+          <tr><td>Dieléctrico Al₂O₃</td><td>20 nm</td><td>Aislamiento de compuerta</td></tr>
+          <tr><td>Semiconductor IGZO</td><td>10 nm</td><td>Capa activa del TFT</td></tr>
+          <tr><td>Source/Drain (Mo)</td><td>100 nm</td><td>Contactos e interconexión superior</td></tr>
+          <tr><td>Pasivación PMMA</td><td>500 nm</td><td>Protección superficial</td></tr>
+        </tbody>
+      </table>
+      <p class="small">Constante dieléctrica reportada para el Al₂O₃: <strong>k = 7</strong>. Los decks DRC/LVS operan sobre geometría de layout, no sobre espesores físicos.</p>
 
-<p>
-In the package details you will find the local path to your package
-data under "Installation". You can use any versioning system to manage your
-files there. 
-</p>
+      <h3>2.2 Parámetros tecnológicos y de modelado</h3>
+      <table>
+        <thead>
+          <tr><th>Especificación</th><th>Valor</th><th>Unidad</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Arquitectura</td><td>Bottom-gate / top-contact</td><td>—</td></tr>
+          <tr><td>Semiconductor</td><td>IGZO amorfo</td><td>—</td></tr>
+          <tr><td>Modelo de extracción</td><td><code>IPN_TFTN</code></td><td>—</td></tr>
+          <tr><td>DBU de la tecnología</td><td>0.001</td><td>µm</td></tr>
+          <tr><td>Rejillas por defecto</td><td>1, 2.5, 5, 10, 20, 25, 50, 100, 200, 250, 500</td><td>µm</td></tr>
+        </tbody>
+      </table>
 
-<p>
-Once you have finished your package, don't forget to specify the package version
-so users of you package will be informed of updates. Finally you can publish the
-package files to a place of your choice and submit the download URL to the 
-Salt Mine server.
-</p>
+      <h3>2.3 Modelo SPICE de referencia</h3>
+      <p>El flujo actual utiliza un <strong>modelo equivalente NMOS de nivel 1</strong> como aproximación compacta del TFT tipo n. Este modelo debe interpretarse como una representación de primer orden útil para extracción y simulación inicial, no como un modelo físico nativo de IGZO.</p>
+      <table>
+        <thead>
+          <tr><th>Parámetro</th><th>Valor</th><th>Unidad / nota</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Nombre del modelo</td><td><code>IPN_TFTN</code></td><td>NMOS</td></tr>
+          <tr><td>LEVEL</td><td>1</td><td>Modelo MOS compacto</td></tr>
+          <tr><td>VTO</td><td>1.08518</td><td>V</td></tr>
+          <tr><td>KP</td><td>7.58022e-08</td><td>A/V²</td></tr>
+          <tr><td>LAMBDA</td><td>0.121604</td><td>1/V</td></tr>
+          <tr><td>GAMMA</td><td>0</td><td>—</td></tr>
+          <tr><td>PHI</td><td>0.7</td><td>V</td></tr>
+          <tr><td>RD</td><td>0</td><td>Ω</td></tr>
+          <tr><td>RS</td><td>0</td><td>Ω</td></tr>
+          <tr><td>CGSO</td><td>0</td><td>F/m equivalente del modelo</td></tr>
+          <tr><td>CGDO</td><td>0</td><td>F/m equivalente del modelo</td></tr>
+        </tbody>
+      </table>
 
+    </section>
+
+    <section id="capas-mascaras">
+      <h2>3) Capas, máscaras y correspondencia física</h2>
+
+      <h3>3.1 Capas de layout (KLayout/GDS)</h3>
+      <table>
+        <thead>
+          <tr><th>Nombre lógico</th><th>Capa/Datatype</th><th>Uso</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Sub_Si-p.drawing</td><td>1/0</td><td>Dominio de diseño / área válida de substrato</td></tr>
+          <tr><td>Sub.text</td><td>1/1</td><td>Texto auxiliar / reservado para etiquetado de substrato</td></tr>
+          <tr><td>Cr/Au.drawing</td><td>2/0</td><td>Bottom gate</td></tr>
+          <tr><td>Oxide.cut</td><td>3/0</td><td>Apertura / corte asociado al dieléctrico y contacto hacia compuerta</td></tr>
+          <tr><td>IGZO.drawing</td><td>4/0</td><td>Semiconductor activo</td></tr>
+          <tr><td>tft.marker</td><td>4/1</td><td>Marcador geométrico del transistor para extracción/PCell</td></tr>
+          <tr><td>Mo.drawing</td><td>5/0</td><td>Source/Drain e interconexión superior</td></tr>
+          <tr><td>Mo.text</td><td>5/1</td><td>Etiquetas de red</td></tr>
+          <tr><td>Mo.port</td><td>5/2</td><td>Puertos físicos para extracción</td></tr>
+          <tr><td>PMMA.cut</td><td>6/0</td><td>Aperturas de pasivación</td></tr>
+        </tbody>
+      </table>
+
+      <h3>3.2 Relación capa ↔ máscara de fabricación</h3>
+      <ul>
+        <li><strong>Máscara G (gate):</strong> define <code>2/0 Cr/Au.drawing</code>.</li>
+        <li><strong>Máscara D (dieléctrico/contacto):</strong> define <code>3/0 Oxide.cut</code>.</li>
+        <li><strong>Máscara S (semiconductor):</strong> define <code>4/0 IGZO.drawing</code>.</li>
+        <li><strong>Máscara M1 (metal superior):</strong> define <code>5/0 Mo.drawing</code>.</li>
+        <li><strong>Máscara P (pasivación):</strong> define <code>6/0 PMMA.cut</code>.</li>
+        <li><strong>Capas auxiliares CAD/PDK:</strong> <code>1/1</code>, <code>4/1</code>, <code>5/1</code> y <code>5/2</code>.</li>
+      </ul>
+
+      <div class="callout">
+        La capa <code>4/1 tft.marker</code> no representa una capa física del proceso: se utiliza como <strong>marcador geométrico interno</strong> para la PCell y la extracción LVS del TFT.
+      </div>
+    </section>
+
+    <section id="derivacion-geometrica">
+      <h2>4) Derivación geométrica interna (DRC/LVS). Solo para uso interno LNunT</h2>
+      <p>El extractor y los scripts auxiliares definen las siguientes capas derivadas:</p>
+      <ul>
+        <li><code>cont_sem = met1 &amp; semi</code> → intersección metal/semiconductor, usada para source/drain.</li>
+        <li><code>cont_gat = gate &amp; semi</code> → intersección gate/semiconductor, usada como referencia geométrica del control de compuerta.</li>
+        <li><code>res_term = met1 &amp; mpin</code> → terminales definidos por puerto.</li>
+        <li><code>res_body = met1 - res_term</code> → porción conductiva restante del metal.</li>
+      </ul>
+      <p><span class="badge">Interpretación</span> La conectividad actual del extractor usa la superposición geométrica como criterio principal y agrega una referencia global implícita a <code>GND</code> para la capa semiconductora, consistente con el uso actual de un modelo MOS equivalente para aproximar el TFT.</p>
+    </section>
+
+    <section id="reglas-drc">
+      <h2>5) Reglas de diseño (DRC) vigentes</h2>
+
+      <h3>5.1 Contención en dominio de substrato</h3>
+      <ul>
+        <li><code>mo_metal.outside(substrate)</code></li>
+        <li><code>igzo.outside(substrate)</code></li>
+      </ul>
+
+      <h3>5.2 Reglas mínimas sobre metal de Mo</h3>
+      <ul>
+        <li><strong>Ancho mínimo:</strong> 5 µm</li>
+        <li><strong>Espacio mínimo:</strong> 5 µm</li>
+        <li><strong>Muesca mínima:</strong> 5 µm</li>
+      </ul>
+
+      <h3>5.3 Reglas de borde</h3>
+      <ul>
+        <li><code>substrate.enclosing(mo_metal,50.um)</code> → separación mínima a borde del área de diseño: 50 µm.</li>
+      </ul>
+
+      <h3>5.4 Integridad geométrica</h3>
+      <ul>
+        <li><code>mo_metal.odd_polygons</code></li>
+        <li><code>mo_port.odd_polygons</code></li>
+      </ul>
+
+      <h3>5.5 Reglas sobre etiquetado</h3>
+      <ul>
+        <li><code>mo_labels.width(5000.um)</code> → detección de geometrías dibujadas indebidamente en la capa de etiquetas.</li>
+      </ul>
+
+      <div class="callout ok">
+        El deck DRC actual es funcional para un primer control geométrico del proceso, especialmente sobre la capa metálica superior y la pertenencia al dominio de diseño.
+      </div>
+    </section>
+
+    <section id="lvs-netlist">
+      <h2>6) Extracción LVS y netlist</h2>
+
+      <h3>6.1 Dispositivo extraído</h3>
+      <ol>
+        <li><strong>TFT tipo n:</strong> se extrae como <code>IPN_TFTN</code>, utilizando una representación compacta basada en geometría.</li>
+      </ol>
+
+      <h3>6.2 Mapeo de terminales en extracción</h3>
+      <ul>
+        <li><code>&quot;SD&quot; =&gt; cont_sem</code> → región de contacto source/drain en superposición Mo–IGZO.</li>
+        <li><code>&quot;G&quot; =&gt; tftg</code> → terminal de compuerta gobernado por el marcador <code>4/1</code>.</li>
+        <li><code>&quot;W&quot; =&gt; semi</code> → cuerpo geométrico del semiconductor.</li>
+        <li><code>&quot;tD&quot;</code>, <code>&quot;tS&quot;</code> y <code>&quot;tG&quot;</code> → terminales auxiliares geométricas para el extractor.</li>
+        <li><code>&quot;tB&quot; =&gt; semi</code> → cuerpo/bulk equivalente, asociado a semiconductor.</li>
+      </ul>
+
+      <h3>6.3 Conectividad y exportación</h3>
+      <ul>
+        <li>Conexión de etiquetas metálicas: <code>connect(met1, mlbl)</code>.</li>
+        <li>Conexión de puertos: <code>connect(res_term, mlbl)</code>.</li>
+        <li>Referencia global: <code>connect_global(semi,&quot;GND&quot;)</code> y <code>connect_implicit(&quot;GND&quot;)</code>.</li>
+        <li>Purga de netlist: <code>netlist.purge</code> y <code>netlist.purge_nets</code>.</li>
+        <li>Salida SPICE: archivo <code>.cir</code> con nombre derivado automáticamente de la celda top.</li>
+        <li>Generación de librería de modelos: macro separado que invoca <code>WriteModels.create_models(output_dir)</code>.</li>
+      </ul>
+
+      <h3>6.4 Modelo SPICE suministrado</h3>
+      <p>La librería del proceso incorpora actualmente la siguiente definición compacta para simulación:</p>
+      <div class="callout ok">
+        <strong>Modelo activo:</strong> <code>.model IPN_TFTN NMOS ( LEVEL=1 VTO=1.08518 KP=7.58022e-08 LAMBDA=0.121604 GAMMA=0 PHI=0.7 RD=0 RS=0 CGSO=0 CGDO=0 )</code>
+      </div>
+      <p>Al usar este modelo con el extractor <code>mos4(&quot;IPN_TFTN&quot;)</code>, el cuarto terminal se conserva en el netlist, pero en el flujo actual se asume una referencia global implícita a <code>GND</code> para el cuerpo equivalente asociado al semiconductor.</p>
+    </section>
+
+    <section id="flujo">
+      <h2>7) Flujo recomendado de diseño (usuario)</h2>
+      <ol>
+        <li>Definir el dominio de diseño en <code>1/0 Sub_Si-p.drawing</code>.</li>
+        <li>Dibujar la compuerta inferior en <code>2/0 Cr/Au.drawing</code>.</li>
+        <li>Definir cortes/contactos dieléctricos en <code>3/0 Oxide.cut</code> cuando aplique.</li>
+        <li>Dibujar la región semiconductora en <code>4/0 IGZO.drawing</code>.</li>
+        <li>Colocar el marcador del transistor en <code>4/1 tft.marker</code> para definición de canal y extracción.</li>
+        <li>Dibujar source/drain e interconexiones en <code>5/0 Mo.drawing</code>.</li>
+        <li>Definir puertos en <code>5/2 Mo.port</code> y etiquetas de red en <code>5/1 Mo.text</code>.</li>
+        <li>Definir aperturas de pasivación en <code>6/0 PMMA.cut</code>.</li>
+        <li>Ejecutar DRC y corregir violaciones.</li>
+        <li>Ejecutar LVS/extracción y revisar netlist SPICE.</li>
+        <li>Generar o copiar la librería de modelos y simular el circuito.</li>
+      </ol>
+    </section>
+
+    <section id="restricciones">
+      <h2>8) Restricciones y buenas prácticas</h2>
+      <ul>
+        <li>No dejar geometrías de <code>IGZO</code> ni <code>Mo</code> fuera del dominio <code>substrate</code>.</li>
+        <li>Respetar 5 µm en ancho/espacio/muesca de la capa <code>Mo.drawing</code> según el deck actual.</li>
+        <li>Mantener una separación mínima de 50 µm al borde del substrato para el metal superior.</li>
+        <li>Usar <code>tft.marker</code> de forma consistente para que la extracción reconozca correctamente el dispositivo.</li>
+        <li>Definir puertos mediante <code>Mo.port</code> y nombres de red mediante <code>Mo.text</code>.</li>
+        <li>Evitar polígonos con autotraslape en metal y puertos.</li>
+        <li>Documentar claramente cuando el bulk equivalente del modelo se asuma a <code>GND</code> en simulación.</li>
+      </ul>
+    </section>
+
+    <section id="trazabilidad">
+      <h2>9) Trazabilidad y control de cambios</h2>
+      <table>
+        <thead>
+          <tr><th>Versión</th><th>Fecha</th><th>Autor(es)</th><th>Cambios</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0.1</td><td>2026-02</td><td>Rodolfo Sánchez Fraga</td><td>Primer deck DRC y vista 2.5D para IPN_TFTn</td></tr>
+          <tr><td>0.2</td><td>2026-03</td><td>Rodolfo Sánchez Fraga</td><td>Inclusión de PCell TFT, PCell de vías y extractor LVS/SPICE</td></tr>
+          <tr><td>1.0</td><td>2026-03</td><td>Equipo PDK CIDESI / LNunT</td><td>Documento técnico integrado para publicación y revisión</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="observaciones">
+      <h2>10) Observaciones técnicas previas a release</h2>
+
+      <div class="callout danger">
+        <strong>Punto 1:</strong> La vista 2.5D actual no coincide con los espesores físicos nominales. La escala se utiliza con el objetivo de mejorar la visualización de dispositivos de capa delgada.
+      </div>
+
+      <div class="callout danger">
+        <strong>Punto 2:</strong> La capa <code>3/0 Oxide.cut</code> aparece nombrada como corte de óxido, pero en la vista 2.5D también se usa como <em>contact</em>. En este caso se utilizan como sinónimos.
+      </div>
+
+      <div class="callout">
+        <strong>Punto 3:</strong> La extracción LVS usa <code>mos4(&quot;IPN_TFTN&quot;)</code> y referencia implícita a <code>GND</code> para el semiconductor/bulk equivalente. Con el modelo SPICE actual <code>LEVEL=1</code>, esta aproximación es útil para circuitos y validación inicial, pero sigue siendo un <strong>modelo sustituto</strong> del TFT y no un modelo físico nativo del material IGZO.
+      </div>
+
+      <div class="callout">
+        <strong>Punto 4:</strong> El PDK ya contiene una PCell funcional para el transistor y una PCell de vías con al menos una definición explícita de vía <code>V1</code> entre <code>Cr/Au (2/0)</code> y <code>Mo (5/0)</code> usando corte <code>3/0</code>. Sería conveniente integrar sus reglas mínimas en el deck DRC oficial.
+      </div>
+
+      <div class="callout">
+        <strong>Punto 5:</strong> La capa <code>PMMA.cut (6/0)</code> participa en la vista de proceso, pero actualmente no tiene reglas DRC explícitas en el deck entregado. Puede añadirse verificación de contención, separación y cobertura mínima para tapeout más robusto.
+      </div>
+    </section>
+
+    <footer>
+      Documento técnico HTML para publicación en línea · IPN_TFTn · Última actualización: marzo 2026 · revisión 1.1
+    </footer>
+  </main>
 </body>
 </html>
-

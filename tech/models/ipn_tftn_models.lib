@@ -1,0 +1,15 @@
+* Modelos para proceso IPN_TFTn
+* Autor script: Rodolfo Sanchez Fraga
+* Laboratorio Nacional de Micro y Nano Tecnologías (LNunT)
+
+.model IPN_TFTN NMOS (
++ LEVEL=1
++ VTO=1.08518
++ KP=7.58022e-08
++ LAMBDA=0.121604
++ GAMMA=0
++ PHI=0.7
++ RD=0
++ RS=0
++ CGSO=0
++ CGDO=0)
