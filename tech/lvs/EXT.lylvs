@@ -18,6 +18,7 @@
  <text># ===== IPN_TFT =====================
 # Soporta:
 #  - Transistores TFTn
+#  - Capacitores Cr_Au / Al2O3 / Mo
 # Rodolfo Sanchez Fraga
 # Marzo 2026
 # --------- INICIO ----------
@@ -38,33 +39,41 @@ end
 
 # --------- Capas de proceso ----------
 subt = input(1,0)   # Substrato
-#glbl = input(1,1)   # Etiqueta global para compuerta
-gate = input(2,0)
-dcut = input(3,0)   # Dielectrico (no utilizada, para compatibilidad futura)
+#glbl = input(1,1)  # Etiqueta global para compuerta
+gate = input(2,0)   # Cr/Au
+dcut = input(3,0)   # Via entre metales a traves de dieléctrico
 semi = input(4,0)   # Semiconductor IGZO
 tftg = input(4,1)   # Marcador transistor
 met1 = input(5,0)   # Capa metal, molibdeno
 mlbl = input(5,1)   # Etiquetas metal
 mpin = input(5,2)   # Marcador puerto
-pass = input(6,0)
+rbody = input(5,3)  # Marcador cuerpo de resistencia
+rterm = input(5,4)  # Marcador terminal de resistencia
+pass = input(6,0)   # Pasivación
 
 # --------- Capas derivadas ----------
-
+# Para TFT
 cont_sem = met1 &amp; semi
 cont_gat = gate &amp; semi
-res_term = met1 &amp; mpin
-res_body = met1 - res_term
+# Para Capacitor
+cap_A = gate &amp; met1
+cap_T1 = met1 &amp; cap_A
+cap_T2 = gate &amp; cap_A
+# Para resistor
+mo_int = met1 - rbody
 
 # --------- Conectividad ----------
-connect(cont_sem, met1)
-connect(cont_gat, gate)
-connect(met1,dcut)
-connect(gate,dcut)
+connect(cont_sem, mo_int) # Conecta contactos de tft a metal
+connect(cont_gat, gate)   # Conecta compuerta a metal
+connect(mo_int,dcut)      # Conexión a via desde Mo
+connect(gate,dcut)        # Conexión a via desde Cr/Au
 
 # propagación de nombres
-connect(met1, mlbl)
-#connect(psub, glbl)
-connect(res_term, mlbl)
+connect(mo_int, mlbl)
+connect(cap_T1, mo_int)
+connect(cap_T2, gate)
+connect(rterm,mo_int)
+
 connect_global(semi,"GND")
 connect_implicit("GND")
 
@@ -80,6 +89,29 @@ extract_devices(mos4("IPN_TFTN"), {
   "tS" =&gt; cont_sem,  
   "tG" =&gt; cont_gat,
   "tB" =&gt; semi
+})
+
+# ===========================================================
+#        EXTRACCIÓN DE CAPACITORES
+# ===========================================================
+cap_mos = 3.54e-15
+
+# Capacitores entre Mo y Cr/Au
+extract_devices(capacitor(" ", cap_mos), {
+  "P1" =&gt; mo_int,
+  "P2" =&gt; gate,
+  "tA" =&gt; cap_T1,
+  "tB" =&gt; cap_T2
+})
+
+# ===========================================================
+#        EXTRACCIÓN DE RESISTORES
+# ===========================================================
+rsq_mo = 11   # Resistencia de hoja de Mo en Ω/□
+
+extract_devices(resistor("  ", rsq_mo), {
+  "R"  =&gt; rbody,
+  "C"  =&gt; rterm,
 })
 
 # ===========================================================
@@ -119,8 +151,9 @@ out_path  = $out_spice || "#{base_name}.cir"
 
 # ====================================================
 netlist.make_top_level_pins
-# netlist.simplify           # útil desactivado al depurar
+#netlist.simplify           # útil desactivado al depurar
 netlist.purge
+netlist.purge_devices
 netlist.purge_nets
 
 use_net_names = true

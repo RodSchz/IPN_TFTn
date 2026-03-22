@@ -24,32 +24,58 @@ report("DRC para IPN_TFTn")
 
   # Definición de capas
   substrate = input(1,0)
+  cr_au = input(2,0)
+  oxide = input(3,0)
   igzo = input(4,0)
   tft_gate = input(4,1)
-  mo_metal = input(5,0)
+  mo_metal = input(5,0) - igzo
   mo_labels = input(5,1)
   mo_port = input(5,2)
-  
-  
-  # Reglas para metal
-  #metal.width(20.um).output("Ancho de metal", "Violación de ancho mínimo de metal (&lt;20um)")
-  #metal.space(20.um).output("Espacio entre metal", "Violación de espacio entre metal (&lt;20um)")
-  #metal.notch(20.um).output("Muesca en metal", "Violación de tamaño de muesca en metal (&lt;20um)")
+  pmma = input(6,0)
+  transistor = igzo - mo_metal 
   
   # Reglas de capas físicas en espacio de diseño
   mo_metal.outside(substrate).output("Metal fuera de área de diseño","Metal debe estar definido dentro de área de substrato")
   igzo.outside(substrate).output("IGZO fuera de área de diseño","IGZO debe estar definido dentro de área de substrato")
   
-  # Reglas de metal
-  mo_metal.width(5.um).output("Ancho de metal Mo", "Violación de ancho mínimo de metal+pin (&lt;20um)")
-  mo_metal.space(5.um).output("Espacio entre metal Mo", "Violación de espacio entre metal+pin (&lt;20um)")
-  mo_metal.notch(5.um).output("Muesca en metal Mo", "Violación de tamaño de muesca en metal+pin (&lt;20um)")  
+  # Reglas de Mo
+  mo_metal.width(10.um).output("Ancho de metal Mo", "Violación de ancho mínimo de Mo (&lt;10um)")
+  mo_metal.space(10.um).output("Espacio entre metal Mo", "Violación de espacio entre capas de Mo (&lt;10um)")
+  mo_metal.notch(10.um).output("Muesca en metal Mo", "Violación de tamaño de muesca en Mo (&lt;10um)")  
+  
+  # Reglas de Cr/Au
+  cr_au.width(10.um).output("Ancho de Cr/Au", "Violación de ancho mínimo de Cr/Au (&lt;10um)")
+  cr_au.space(10.um).output("Espacio entre capas de Cr/Au", "Violación de espacio entre capas de Cr/Au (&lt;10um)")
+  cr_au.notch(10.um).output("Muesca en Cr/Au", "Violación de tamaño de muesca en Cr/Au (&lt;10um)")
+  
+  # Reglas de IGZO
+  igzo.width(10.um).output("Ancho de IGZO", "Violación de ancho mínimo de IGZO (&lt;10um)")
+  igzo.space(10.um).output("Espacio entre capas de IGZO", "Violación de espacio entre capas de IGZO (&lt;10um)")
+  igzo.notch(10.um).output("Muesca en IGZO", "Violación de tamaño de muesca en IGZO (&lt;10um)")    
+  
+  # Reglas de PMMA
+  pmma.width(10.um).output("Ancho de PMMA", "Violación de ancho mínimo de PMMA (&lt;10um)")
+  pmma.space(10.um).output("Espacio entre capas de PMMA", "Violación de espacio entre capas de PMMA (&lt;10um)")
+  pmma.notch(10.um).output("Muesca en PMMA", "Violación de tamaño de muesca en PMMA (&lt;10um)")   
+  mo_metal.enclosing(pmma,10.um).output("Error de traslape entre Mo y pmma","Violación de espacio mínimo de encierro de Mo sobre abertura en PMMA (&lt;10um)")
+  
+  # Reglas de via Cr/Au a Mo
+  oxide.width(10.um).output("Ancho de abertura en Al2O3", "Violación de ancho mínimo de abertura en Al2O3 (&lt;10um)")
+  oxide.space(10.um).output("Espacio entre capas de abertura en Al2O3", "Violación de espacio entre capas de abertura en Al2O3 (&lt;10um)")
+  oxide.notch(10.um).output("Muesca en abertura en Al2O3", "Violación de tamaño de muesca en abertura en Al2O3 (&lt;10um)")
+  mo_metal.enclosing(oxide,10.um).output("Error de traslape entre Mo y Al2O3","Violación de espacio mínimo de encierro de Mo sobre Al2O3 (&lt;10um)")
+  cr_au.enclosing(oxide,10.um).output("Error de traslape entre Cr/Au y Al2O3","Violación de espacio mínimo de encierro de Cr/Au sobre Al2O3 (&lt;10um)")
+  
+  # Reglas de dimensiones internas de TFT
+  transistor.width(5.um).output("Dimension de transistor", "Violación de dimensión dentro de transisor (&lt;5um)")
+  transistor.notch(5.um).output("Dimension de transistor", "Violación de dimensión dentro de transisor (&lt;5um)")
   
   # Error de dibujo en capa de etiquetas
   mo_labels.width(5000.um).output("Geometrias en capa de etiquetas", "Geometrías en capa de etiquetas no se toman en cuenta")
   
   substrate.enclosing(mo_metal,50.um).output("Error a borde de substrato","Espacio a borde de chip insuficiente (&lt;50um)")
   
+  # Detección de polígonos irregulares
   mo_metal.odd_polygons.output("Error poligono metal", "Poligono con autotraslape en Mo.drawing")
   mo_port.odd_polygons.output("Error poligono puerto", "Poligono con autotraslape en capa de Mo.port")
   </text>
